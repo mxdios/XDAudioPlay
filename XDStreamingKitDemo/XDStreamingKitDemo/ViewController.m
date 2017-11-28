@@ -9,12 +9,24 @@
 #import "ViewController.h"
 #import "STKAudioPlayer.h"
 
+typedef enum : NSUInteger {
+    VoiceStatePlaying,
+    VoiceStatePause,
+    VoiceStateCease,
+} VoiceState;
+
 @interface ViewController ()<STKAudioPlayerDelegate>
 {
     NSArray *_dataSourceArray;
     NSTimer *_stkTimer;
 }
+@property (weak, nonatomic) IBOutlet UIButton *playBtn;
+@property (weak, nonatomic) IBOutlet UISlider *planSlider;
+@property (weak, nonatomic) IBOutlet UILabel *playTimeLabel;
+@property (weak, nonatomic) IBOutlet UILabel *allTimeLabel;
+@property (weak, nonatomic) IBOutlet UILabel *voiceTitleLabel;
 @property (nonatomic, strong) STKAudioPlayer *stkAudioPlayer;
+@property (nonatomic, assign) VoiceState voiceState;
 @end
 
 @implementation ViewController
@@ -34,8 +46,12 @@
                          @{@"title": @"没那种命", @"url": @"http://download.lingyongqian.cn/music/ForElise.mp3"},
                          @{@"title": @"不得不爱", @"url": @"http://mr7.doubanio.com/39ec9c9b5bbac0af7b373d1c62c294a3/1/fm/song/p1393354_128k.mp4"},
                          @{@"title": @"海阔天空", @"url": @"http://mr7.doubanio.com/16c59061a6a82bbb92bdd21e626db152/0/fm/song/p966452_128k.mp4"}];
-    
-    NSString *urlString = _dataSourceArray.firstObject[@"url"];
+    self.voiceState = VoiceStateCease;
+}
+- (void)play:(NSInteger)index {
+    NSDictionary *voiceDict = _dataSourceArray[index];
+    self.voiceTitleLabel.text = voiceDict[@"title"];
+    NSString *urlString = voiceDict[@"url"];
     [self.stkAudioPlayer play:urlString];
     if (_stkTimer) {
         [_stkTimer setFireDate:[NSDate distantPast]];
@@ -44,26 +60,74 @@
         [[NSRunLoop currentRunLoop] addTimer:_stkTimer forMode:NSRunLoopCommonModes];
     }
 }
+- (IBAction)playBtnClick:(UIButton *)sender {
+    switch (self.voiceState) {
+        case VoiceStatePlaying:
+        {
+            [self.stkAudioPlayer pause];
+            self.voiceState = VoiceStatePause;
+            [_stkTimer setFireDate:[NSDate distantFuture]];
+        }
+            break;
+        case VoiceStatePause:
+        {
+            [self.stkAudioPlayer resume];
+            [_stkTimer setFireDate:[NSDate distantPast]];
+            self.voiceState = VoiceStatePlaying;
+        }
+            break;
+        case VoiceStateCease:
+        {
+            [self play:0];
+            self.voiceState = VoiceStatePlaying;
+        }
+            break;
+        default:
+            break;
+    }
+    sender.selected = !sender.selected;
+}
+- (IBAction)lastBtnClick:(UIButton *)sender {
+    
+}
+- (IBAction)nextBtnClick:(UIButton *)sender {
+}
+- (IBAction)loopBtnClick:(UIButton *)sender {
+}
+- (IBAction)listBtnClick:(UIButton *)sender {
+}
+- (IBAction)planSliderChanged:(UISlider *)sender {
+}
+
 - (void)streamingKitPlay {
-    //获取当前播放音频的总时间时间
-    double duration = self.stkAudioPlayer.duration;
-    //当前播放的时间
     double progress = self.stkAudioPlayer.progress;
-    NSLog(@"stk 播放总时间 = %f 当前播放时间 = %f",duration, progress);
+    double duration = self.stkAudioPlayer.duration;
     if (self.stkAudioPlayer.state == STKAudioPlayerStateBuffering){
         NSLog(@"stk 缓冲了");
     }
-    
+    if (duration > 0) {
+        self.playTimeLabel.text = [self convertStringWithTime:progress];
+        self.allTimeLabel.text = [self convertStringWithTime:duration];
+        self.planSlider.value = progress / duration;
+    }
+}
+- (NSString *)convertStringWithTime:(float)time {
+    if (isnan(time)) time = 0.f;
+    int min = time / 60.0;
+    int sec = time - min * 60;
+    NSString * minStr = min > 9 ? [NSString stringWithFormat:@"%d",min] : [NSString stringWithFormat:@"0%d",min];
+    NSString * secStr = sec > 9 ? [NSString stringWithFormat:@"%d",sec] : [NSString stringWithFormat:@"0%d",sec];
+    NSString * timeStr = [NSString stringWithFormat:@"%@:%@",minStr, secStr];
+    return timeStr;
 }
 #pragma mark - StreamingKit代理方法
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer stateChanged:(STKAudioPlayerState)state previousState:(STKAudioPlayerState)previousState {
     NSLog(@"当播放器 状态发生改变的时候调用，  暂停-开始播放都会调用");
 }
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer unexpectedError:(STKAudioPlayerErrorCode)errorCode {
-    NSLog(@"引发的意外和可能发生的不可恢复的错误，极少概率会调用。  就是此歌曲不能加载，或者url是不可用的");
-//    [MBProgressHUD showText:[self getErrorMsg:errorCode]];
-    //    [self.stkAudioPlayer stop];
-    //    [_stkTimer setFireDate:[NSDate distantFuture]];
+    NSLog(@"url无效, 此音频不能播放。");
+    self.voiceState = VoiceStateCease;
+    self.playBtn.selected = NO;
 }
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer didStartPlayingQueueItemId:(NSObject*)queueItemId {
     NSLog(@"当一个项目开始播放调用");
