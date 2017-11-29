@@ -23,6 +23,7 @@
 		C2D5FACC1FCC1232007748FE /* STKHTTPDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = C2D5FAC01FCC1232007748FE /* STKHTTPDataSource.m */; };
 		C2D5FACD1FCC1232007748FE /* STKLocalFileDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = C2D5FAC21FCC1232007748FE /* STKLocalFileDataSource.m */; };
 		C2D5FACE1FCC1232007748FE /* STKQueueEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = C2D5FAC41FCC1232007748FE /* STKQueueEntry.m */; };
+		C2D5FAD21FCE8673007748FE /* XDTools.m in Sources */ = {isa = PBXBuildFile; fileRef = C2D5FAD11FCE8673007748FE /* XDTools.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +69,8 @@
 		C2D5FAC31FCC1232007748FE /* STKQueueEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STKQueueEntry.h; sourceTree = "<group>"; };
 		C2D5FAC41FCC1232007748FE /* STKQueueEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STKQueueEntry.m; sourceTree = "<group>"; };
 		C2D5FAC51FCC1232007748FE /* StreamingKit-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "StreamingKit-Prefix.pch"; sourceTree = "<group>"; };
+		C2D5FAD01FCE8673007748FE /* XDTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XDTools.h; sourceTree = "<group>"; };
+		C2D5FAD11FCE8673007748FE /* XDTools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XDTools.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +117,8 @@
 				C2D5FA8F1FCC0789007748FE /* AppDelegate.m */,
 				C2D5FA911FCC0789007748FE /* ViewController.h */,
 				C2D5FA921FCC0789007748FE /* ViewController.m */,
+				C2D5FAD01FCE8673007748FE /* XDTools.h */,
+				C2D5FAD11FCE8673007748FE /* XDTools.m */,
 				C2D5FA941FCC0789007748FE /* Main.storyboard */,
 				C2D5FA971FCC0789007748FE /* Assets.xcassets */,
 				C2D5FA991FCC0789007748FE /* LaunchScreen.storyboard */,
@@ -262,6 +267,7 @@
 			files = (
 				C2D5FACD1FCC1232007748FE /* STKLocalFileDataSource.m in Sources */,
 				C2D5FAC81FCC1232007748FE /* STKAutoRecoveringHTTPDataSource.m in Sources */,
+				C2D5FAD21FCE8673007748FE /* XDTools.m in Sources */,
 				C2D5FAC61FCC1232007748FE /* NSMutableArray+STKAudioPlayer.m in Sources */,
 				C2D5FAC91FCC1232007748FE /* STKCoreFoundationDataSource.m in Sources */,
 				C2D5FACB1FCC1232007748FE /* STKDataSourceWrapper.m in Sources */,

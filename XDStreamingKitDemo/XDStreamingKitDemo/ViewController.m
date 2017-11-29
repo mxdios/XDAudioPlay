@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "STKAudioPlayer.h"
+#import "XDTools.h"
 
 typedef enum : NSUInteger {
     VoiceStatePlaying,
@@ -19,6 +20,8 @@ typedef enum : NSUInteger {
 {
     NSArray *_dataSourceArray;
     NSTimer *_stkTimer;
+    NSInteger _index;
+    BOOL _isSliderChange;
 }
 @property (weak, nonatomic) IBOutlet UIButton *playBtn;
 @property (weak, nonatomic) IBOutlet UISlider *planSlider;
@@ -43,10 +46,10 @@ typedef enum : NSUInteger {
 - (void)viewDidLoad {
     [super viewDidLoad];
     _dataSourceArray = @[@{@"title": @"夏天的味道", @"url": @"http://download.lingyongqian.cn/music/AdagioSostenuto.mp3"},
-                         @{@"title": @"没那种命", @"url": @"http://download.lingyongqian.cn/music/ForElise.mp3"},
-                         @{@"title": @"不得不爱", @"url": @"http://mr7.doubanio.com/39ec9c9b5bbac0af7b373d1c62c294a3/1/fm/song/p1393354_128k.mp4"},
-                         @{@"title": @"海阔天空", @"url": @"http://mr7.doubanio.com/16c59061a6a82bbb92bdd21e626db152/0/fm/song/p966452_128k.mp4"}];
+                         @{@"title": @"没那种命", @"url": @"http://download.lingyongqian.cn/music/ForElise.mp3"}];
     self.voiceState = VoiceStateCease;
+    _index = 0;
+    _isSliderChange = YES;
 }
 - (void)play:(NSInteger)index {
     NSDictionary *voiceDict = _dataSourceArray[index];
@@ -78,7 +81,7 @@ typedef enum : NSUInteger {
             break;
         case VoiceStateCease:
         {
-            [self play:0];
+            [self play:_index];
             self.voiceState = VoiceStatePlaying;
         }
             break;
@@ -88,41 +91,42 @@ typedef enum : NSUInteger {
     sender.selected = !sender.selected;
 }
 - (IBAction)lastBtnClick:(UIButton *)sender {
-    
+    _index ? (_index -= 1) : (_index = _dataSourceArray.count - 1);
+    [self play:_index];
 }
 - (IBAction)nextBtnClick:(UIButton *)sender {
+    _index == _dataSourceArray.count - 1 ? (_index = 0) : (_index += 1);
+    [self play:_index];
 }
 - (IBAction)loopBtnClick:(UIButton *)sender {
 }
 - (IBAction)listBtnClick:(UIButton *)sender {
 }
-- (IBAction)planSliderChanged:(UISlider *)sender {
+- (IBAction)planSliderBegingChanged:(UISlider *)sender {
+    NSLog(@"down = %ld", sender.state);
+    _isSliderChange = NO;
+}
+- (IBAction)planSliderEndChanged:(UISlider *)sender {
+    NSLog(@"改变 = %ld", sender.state);
+    _isSliderChange = YES;
+    if (self.voiceState != VoiceStateCease) {
+        [self.stkAudioPlayer seekToTime:sender.value * self.stkAudioPlayer.duration];
+    }
 }
 
 - (void)streamingKitPlay {
     double progress = self.stkAudioPlayer.progress;
     double duration = self.stkAudioPlayer.duration;
-    if (self.stkAudioPlayer.state == STKAudioPlayerStateBuffering){
-        NSLog(@"stk 缓冲了");
-    }
-    if (duration > 0) {
-        self.playTimeLabel.text = [self convertStringWithTime:progress];
-        self.allTimeLabel.text = [self convertStringWithTime:duration];
-        self.planSlider.value = progress / duration;
+    if (duration > 0 && _isSliderChange) {
+        self.playTimeLabel.text = [XDTools convertStringWithTime:progress];
+        self.allTimeLabel.text = [XDTools convertStringWithTime:duration];
+        [self.planSlider setValue:progress / duration animated:YES];
     }
 }
-- (NSString *)convertStringWithTime:(float)time {
-    if (isnan(time)) time = 0.f;
-    int min = time / 60.0;
-    int sec = time - min * 60;
-    NSString * minStr = min > 9 ? [NSString stringWithFormat:@"%d",min] : [NSString stringWithFormat:@"0%d",min];
-    NSString * secStr = sec > 9 ? [NSString stringWithFormat:@"%d",sec] : [NSString stringWithFormat:@"0%d",sec];
-    NSString * timeStr = [NSString stringWithFormat:@"%@:%@",minStr, secStr];
-    return timeStr;
-}
+
 #pragma mark - StreamingKit代理方法
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer stateChanged:(STKAudioPlayerState)state previousState:(STKAudioPlayerState)previousState {
-    NSLog(@"当播放器 状态发生改变的时候调用，  暂停-开始播放都会调用");
+    NSLog(@"暂停-开始播放都会调用");
 }
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer unexpectedError:(STKAudioPlayerErrorCode)errorCode {
     NSLog(@"url无效, 此音频不能播放。");
@@ -130,13 +134,7 @@ typedef enum : NSUInteger {
     self.playBtn.selected = NO;
 }
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer didStartPlayingQueueItemId:(NSObject*)queueItemId {
-    NSLog(@"当一个项目开始播放调用");
-//    self.playBtn.selected = YES;
-//    self.isPlay = YES;
-//    if (_playPlan != 0) {
-//        [self.stkAudioPlayer seekToTime:_playPlan];
-//        _playPlan = 0;
-//    }
+    NSLog(@"音频开始播放");
 }
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer didFinishBufferingSourceWithQueueItemId:(NSObject*)queueItemId {
     NSLog(@"完成缓冲。。。%@", queueItemId);

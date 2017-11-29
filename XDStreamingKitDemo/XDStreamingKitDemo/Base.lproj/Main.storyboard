@@ -69,10 +69,11 @@
                                     <action selector="lastBtnClick:" destination="BYZ-38-t0r" eventType="touchUpInside" id="n86-ax-UB4"/>
                                 </connections>
                             </button>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="01F-4g-alh">
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="01F-4g-alh">
                                 <rect key="frame" x="44.5" y="517.5" width="286" height="31"/>
                                 <connections>
-                                    <action selector="planSliderChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="BoR-Vg-jva"/>
+                                    <action selector="planSliderBegingChanged:" destination="BYZ-38-t0r" eventType="touchDown" id="8mo-x9-07n"/>
+                                    <action selector="planSliderEndChanged:" destination="BYZ-38-t0r" eventType="touchUpInside" id="BN6-ip-GR5"/>
                                 </connections>
                             </slider>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Eid-FR-Vyb">
