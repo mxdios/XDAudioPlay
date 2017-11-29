@@ -88,7 +88,6 @@ typedef enum : NSUInteger {
         default:
             break;
     }
-    sender.selected = !sender.selected;
 }
 - (IBAction)lastBtnClick:(UIButton *)sender {
     _index ? (_index -= 1) : (_index = _dataSourceArray.count - 1);
@@ -127,11 +126,24 @@ typedef enum : NSUInteger {
 #pragma mark - StreamingKit代理方法
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer stateChanged:(STKAudioPlayerState)state previousState:(STKAudioPlayerState)previousState {
     NSLog(@"暂停-开始播放都会调用");
+    switch (state) {
+        case STKAudioPlayerStatePlaying:
+            self.playBtn.selected = YES;
+            self.voiceState = VoiceStatePlaying;
+            break;
+        case STKAudioPlayerStatePaused:
+            self.playBtn.selected = NO;
+            self.voiceState = VoiceStatePause;
+            break;
+        default:
+            self.playBtn.selected = NO;
+            self.voiceState = VoiceStateCease;
+            break;
+    }
 }
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer unexpectedError:(STKAudioPlayerErrorCode)errorCode {
     NSLog(@"url无效, 此音频不能播放。");
     self.voiceState = VoiceStateCease;
-    self.playBtn.selected = NO;
 }
 - (void)audioPlayer:(STKAudioPlayer*)audioPlayer didStartPlayingQueueItemId:(NSObject*)queueItemId {
     NSLog(@"音频开始播放");
